@@ -1,0 +1,8 @@
+<Restaurants>
+
+    <Restaurant>
+        <RestaurantName></RestaurantName>
+        <Category></Category>
+        <Address></Address>
+    </Restaurant>
+</Restaurants>

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Small Business - Start Bootstrap Template</title>
+        <!-- Favicon-->
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="css/styles.css" rel="stylesheet" />
+        <style>
+html, body {
+  height: 100%;
+  margin: 0;
+}
+.content {
+  min-height: 100%;
+}
+.content-inside {
+  padding: 20px;
+  padding-bottom: 50px;
+}
+.footer {
+  height: 50px;
+  margin-top: -50px;
+}            
+        </style>
+    </head>
+    <body>
+        <!-- Responsive navbar
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container px-5">
+                <a class="navbar-brand" href="#!">Start Bootstrap</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="#!">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#!">Contact</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#!">Services</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav> -->
+        <!-- Page Content-->
+        <div class="container px-4 px-lg-5">
+            <!-- Heading Row-->
+            <div class="row gx-10 gx-lg-10 align-items-center my-1">
+                <div class="col-lg-3"><img class="img-fluid rounded mb-1 mb-lg-5" src="assets/1.jpeg" alt="..." />
+                </div>
+                <div class="col-lg-6">
+                    <h1 class="font-weight-light">Bank of 45821 Course</h1>
+                    <p>Best bank in Israel</p>
+                    <a class="btn btn-primary" onclick="ProvideCustomerDetails()">Add customer</a>
+                    <a class="btn btn-primary" onclick="SearchCustomerDetails()">Search customer</a>
+                    <a class="btn btn-primary" onclick=" viewAll()">View customers</a>
+                    <a class="btn btn-primary" onclick=" ViewAllActions()">View actions</a><br><br>
+                    <a class="btn btn-primary" onclick=" showActionsOnCustomers()">Actions On Customers</a>
+                    
+                    <br><br>
+                    <a class="btn btn-success" onclick=" AddBonus()">Bonus</a>
+                    <a class="btn btn-danger" onclick=" AddCommission()">Commission</a>
+                </div>
+                <div id="actionWindow" class="col-lg-3">
+                  </div>
+
+            </div>
+            
+            
+            <!-- Content Row-->
+            <div class="row gx-4 gx-lg-5" id="displayWindow">
+            </div>
+        </div>
+        <!-- Footer-->
+        <!-- SHELLY to work on sticky-->
+        <!-- <footer   class="footer">
+            <div class="py-2 bg-dark">
+            <div class="container px-4 px-lg-5"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2021</p></div>
+            </div>
+        </footer> -->
+        <script>
+            // <!-- SHELLY to work on delete account Actions, view all, view per account,deposit,Withdraw-->
+            
+            let customers=[]
+            let actions=[]
+            let UniqueAccountID=0
+            function ProvideCustomerDetails(){
+                actionWindow.innerHTML =`<label for="customername">Account name:</label>
+                    <input type="text" id="customername" name="customername" value=""><br>
+                    <label for="id">ID:</label><br>
+                    <input type="number" id="id" name="id"><br>
+                    <label for="Balance">Initial Balance:</label><br>
+                    <input type="number" id="Balance" name="Balance" value=0><br><br>
+                    <button class ="btn btn-warning" onclick=addCustomerFunc()>Done</button>` 
+            }            
+            function addCustomerFunc(){
+                let customer={
+                    Name: customername.value,
+                    CustomerID: id.value,
+                    Balance: Number(Balance.value),
+                    Status: "Active",
+                    //PK
+                    AccountId: UniqueAccountID++
+                }
+                console.log(customers)
+                customers.push(customer)
+                actionWindow.innerHTML =`<p Style="color: green"> Customer is successfully added</p>`    
+            }
+            function viewAll(){
+                clearWindow('actionWindow')
+                if (customers.length==0)
+                    displayWindow.innerHTML = `<h1 style="color :red">DB is empty </h1>`
+                else
+                    clearWindow(`displayWindow`)
+                for (i=0;i<customers.length;i++)
+                {
+                    displayOnContentSection(customers[i],"many")
+                }
+                   
+            }
+            function clearWindow(div){
+                var div = document.getElementById(div)
+                while(div.hasChildNodes()) {
+                    div.removeChild(div.firstChild)
+                }
+            }
+            function showActionsOnCustomers(){
+                displayWindow.innerHTML=''
+                customers.forEach(customer =>displayOnContentSection(customer,'many'))
+                for (i=0;i<customers.length;i++)
+                {
+                    let customer=customers[i]
+                    drawActionsOnAccount(customer.AccountId)
+                }
+            }
+
+            function displayOnContentSection(customer,drawOneFlag){
+                
+                console.log(customers)
+                if (drawOneFlag=="one")
+                {
+                    displayWindow.innerHTML=`<div class="col-md-4 mb-5">
+                                                <div class="card h-100">
+                                                    <div class="card-body">
+                                                        <h2 class="card-title" id="AccountName">Account Name:${customer.CustomerName}</h2>
+                                                        <button class="btn btn-danger btn-sm" style="float: right;" onclick="deleteAccount(${customer.AccountId})">Delete</button>
+                                                        <p class="card-text" id="CustID">Id: ${customer.CustomerID}</p>
+                                                        <div class="card-text" id= "CustStatus${customer.AccountId}" style="float: right;">Status: ${customer[3]}</div>
+                                                        <p class="card-text" id="CustBalance${customer.AccountId}">Balance: ${customer.Balance}</p>
+                                                        <p class="card-text" id="Actions${customer.AccountId}"></p>
+                                                    </div>
+                                                    <div id="footer${customer.AccountId}" class="card-footer" >
+                                                        <button class="btn btn-primary btn-sm" onclick="drawDepoWith(${customer.AccountId},'deposit')">Deposit</button>
+                                                        <button class="btn btn-primary btn-sm" onclick="drawDepoWith(${customer.AccountId},'withdraw')">Withdraw</button>
+                                                    </div>
+                                                </div>
+                                            </div>`
+                }
+                else
+                {
+                    displayWindow.innerHTML+=`<div class="col-md-4 mb-5">
+                                                <div class="card h-100">
+                                                    <div class="card-body">
+                                                        <h2 class="card-title" id="AccountName">Account Name:${customer.CustomerName}</h2>
+                                                        <button class="btn btn-danger btn-sm" style="float: right;" onclick="deleteAccount(${customer.AccountId})">Delete</button>
+                                                        <p class="card-text" id="CustID">Id: ${customer.CustomerID}</p>
+                                                        <div class="card-text" id= "CustStatus${customer.AccountId}" style="float: right;">
+                                                            <p>Status: ${customer.Status}</p>
+                                                            </div>
+                                                        <p class="card-text" id="CustBalance${customer.AccountId}">Balance: ${customer.Balance}</p>
+                                                        <p class="card-text" id="Actions${customer.AccountId}"></p>
+                                                    </div>
+                                                    <div id="footer${customer.AccountId}" class="card-footer" >
+                                                        <button class="btn btn-primary btn-sm" onclick="drawDepoWith(${customer.AccountId},'deposit')">Deposit</button>
+                                                        <button class="btn btn-primary btn-sm" onclick="drawDepoWith(${customer.AccountId},'withdraw')">Withdraw</button>
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>`
+                }
+                console.log(displayWindow.innerHTML)
+            }
+            function deleteAccount(accountId)
+            {
+                let customer=findCustomerPerAccountID(accountId)
+                console.log(customer)
+                let myDiv =document.getElementById('custStatus'+accountId)
+                console.log(myDiv)
+             //Customer is [Name: 0, Customer ID: 1, Balance 2, Status 3, Account ID 4]
+                customer.Status= 'Not Active'
+                // myDiv.innerHTML = `<p class="card-text" id="CustStatus${accountId}">Balance: Not Active</p>`
+                
+            }
+
+            function SearchCustomerDetails(){
+                actionWindow.innerHTML =`<label for="CustomerName">By Account name:</label>
+                    <input type="text" id="CustomerName" name="CustomerName"><br>
+                    <label for="Cust_id">By ID:</label><br>
+                    <input type="number" id="Cust_id" name="Cust_id" defaultvalue="-1"><br><br>
+                    <button class ="btn btn-warning" onclick= "searchCustomer()">Done</button>` 
+           
+                }
+            function searchCustomer(){
+                console.log(customers)
+                let CountFound = 0
+                clearWindow(`displayWindow`)
+                for (i=0;i<customers.length;i++)
+                {
+                    let customer =customers[i]
+                    // console.log(Cust_id.value) 
+                    if (Cust_id.value == customer.CustomerID )
+                    {
+                            displayOnContentSection(customers[i],"one")
+                            CountFound++
+                    }
+                    else if (customer.CustomerName.search(CustomerName.value)!=-1)
+                     {  
+                            CountFound++
+                            if (CountFound>1)
+                            {                 
+                                actionWindow.innerHTML =`<p Style="color: green"> ${CountFound} customers are found, see below</p>`
+                            }
+                            displayOnContentSection(customers[i],"many")
+                            
+                     }
+                }
+                if (CountFound==0)                
+                    actionWindow.innerHTML =`<p Style="color: red">customer is not found</p>`
+                else
+                    {
+                        actionWindow.innerHTML =`<p Style="color: green"> Customer is found, see below</p>`
+                    }    
+                console.log(`Count Found:${CountFound}`)
+                
+            }
+            function drawDepoWith(DivId,action){
+                // To ask why doesn't it work with innerHTML for specific ID
+                let Mydiv = document.getElementById(`footer`+DivId)  
+                switch (action){
+                case 'deposit' :
+                    {
+                        Mydiv.innerHTML = 
+                                    `<label for="updatedAmount">Deposit amount:</label>
+                                    <input type="number" id="updatedAmount" name="updatedAmount" value=0>
+                                     <button class ="btn btn-warning" onclick=updatedGet(${DivId},'deposit')>Done</button>` 
+                        break
+                    }
+                case 'withdraw' :
+                    {console.log(`arrived to withdraw`)
+                        Mydiv.innerHTML = 
+                                    `<label for="updatedAmount">WithDraw amount:</label>
+                                    <input type="number" id="updatedAmount" name="updatedAmount" value=0>
+                                     <button class ="btn btn-warning" onclick=updatedGet(${DivId},'withdraw')>Done</button>` 
+                        break            
+                    }
+                case 'back':
+                    {
+                        Mydiv.innerHTML = 
+                                    `<button class="btn btn-primary btn-sm" onclick="drawDepoWith(${DivId},'deposit')">Deposit</button>
+                                    <button class="btn btn-primary btn-sm" onclick="drawDepoWith(${DivId},'withdraw')">Withdraw</button>` 
+                        break     
+                    }
+                }
+            }
+
+            function UpdateAllAmount(msg){
+                let amount =Number(UpdateAllAmountInput.value)
+                console.log(`amount is ${amount}`)
+                if (msg=='Commission')
+                    amount =-amount
+                for(i=0;i<customers.length;i++)
+                    {
+                        let customer =customers[i]
+                        console.log(customers)
+                        console.log(customer)
+                        if (customer.Status=='Active')
+                            {
+                                 if (msg=='Commission')
+                                {
+                                        updateBalance(customer.AccountId ,amount,'Commission')
+                                }
+                                else if (msg=='Bonus')
+                                    updateBalance(customer.AccountId,amount,'Bonus')                                
+                                actionWindow.innerHTML =`<p Style="color: Grean">Update is done</p>`
+                            }
+                    }
+            }
+           
+            function updatedGet(accountId,msg){
+                let amount =Number(updatedAmount.value) 
+                if (amount==0) return
+                else
+                    {
+                        if (msg=='deposit')
+                            updateBalance(accountId,amount,'Deposit')
+                        else if (msg=='withdraw')
+                        {
+                            amount =-(updatedAmount.value)        
+                            updateBalance(accountId,amount,'Withdraw')
+                        }
+                    }
+                drawDepoWith(accountId,'back')
+                drawActionsOnAccount(accountId)
+            }
+     
+            function updateBalance(accountID,amount,type){
+                console.log(`Account Id ${accountID}, amount ${amount}, type ${type}`)
+                if (customers.length==0) return    
+                let customer=findCustomerPerAccountID(accountID)
+                console.log(customers)
+                console.log(accountID)
+                console.log(customer)
+                
+                let action ={
+                    AccountId: accountID,
+                    ActionType: type,
+                    ActionAmount: amount
+                }
+                //add to balance -Customer is [Name: 0, Customer ID: 1, Balance 2, Status 3, Account ID 4]
+                customer.Balance+=Number(amount)
+                console.log(`deposit is done, balance is ${customer.Balance}`)
+                actions.push(action)
+                } 
+           
+            function drawActionsOnAccount(accountID)
+            {console.log(`arrived to 313 ${accountID}`)
+                let myDiv= document.getElementById('Actions'+accountID)
+                myDiv.innerHTML =''
+                for (let i=0; i<actions.length;i++)
+                {   
+                    
+                    let action=actions[i]
+                    console.log('action is ${action}')
+                    if(action.AccountId==accountID)
+                    {
+                        let account=findCustomerPerAccountID(accountID)
+                        console.log('account is ${account}')
+                        let balance= account.Balance
+                        console.log(`account is row278 ${account}` )
+                        document.getElementById('CustBalance'+accountID).innerText=`Balance: ${balance}`
+                        myDiv.innerHTML += `<p>${action.ActionType} ${action.ActionAmount}</p>`
+                    }   
+                }
+               
+            }
+             
+            function findCustomerPerAccountID(accountID){
+                for (let i=0; i<customers.length;i++)
+                {   
+                    let customer=customers[i]
+                    if(customer.AccountId==accountID)
+                        return customers[i] 
+                }
+            }
+            function AddBonus(){
+                // clearWindow(actionWindow)
+                actionWindow.innerHTML=
+                `<label for="UpdateAllAmountInput">Bonus Amount:</label> <br>
+                                    <input type="number" id="UpdateAllAmountInput" name="UpdateAllAmountInput" value=0><br>
+                                     <button class ="btn btn-warning" onclick= UpdateAllAmount('Bonus')>Done</button>` 
+          
+            }
+            
+            function AddCommission(){
+                // clearWindow(actionWindow)
+                actionWindow.innerHTML=
+                `<label for="UpdateAllAmountInput">Commission Amount:</label> <br>
+                                    <input type="number" id="UpdateAllAmountInput" name="UpdateAllAmountInput" value=0><br>
+                                     <button class ="btn btn-warning" onclick=UpdateAllAmount('Commission')>Done</button>` 
+          
+            }
+            function ViewAllActions(){
+                clearWindow(`displayWindow`)
+                for (i=0;i<actions.length ;i++)
+                { 
+                    let action=actions[i]
+                    // [accountID,'Deposit', amount]
+                    displayWindow.innerHTML+=
+                    `<div class="col-md-4 mb-5">
+                                                <div class="card h-100">
+                                                    <div class="card-body">
+                                                        <h2 class="card-title" id="AccountName">Action: ${i+1}</h2>
+                                                        <p>Action: ${action.ActionType}  </p>
+                                                        <p>Amount: ${action.ActionAmount}  </p>
+                                                        <p>Account ID: ${action.AccountId}  </p>
+                                                    </div>
+                                                </div>
+                                            </div>`
+                    
+                }
+            }                      
+        </script>
+   </bodMy
+   
+]
